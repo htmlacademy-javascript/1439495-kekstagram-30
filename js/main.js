@@ -26,43 +26,53 @@ const NAMES = [
   'Елена',
   'Николай'
 ];
+const PHOTOS_COUNT = 25;
+const Comments = {
+  MIN: 1,
+  MAX: 30
+};
+const Likes = {
+  MIN: 15,
+  MAX: 200
+};
+const Avatars = {
+  MIN: 1,
+  MAX: 6
+};
 
 const getRandomNumber = (min, max) => Math.floor(min + Math.random() * (max + 1 - min));
 
 const getRandomArrayEl = (array) => array[getRandomNumber(0, array.length - 1)];
 
-const createUnicNumber = (min, max) => {
-  const previousNumbers = [];
+const photos = [];
 
-  return () => {
-    let currentNumber = getRandomNumber(min, max);
-    while (previousNumbers.includes(currentNumber)) {
-      currentNumber = getRandomNumber(min, max);
-    }
-    previousNumbers.push(currentNumber);
-    return currentNumber;
-  };
-};
-
-const generatePhotoId = createUnicNumber(1, 25);
-const generateUrlNumber = createUnicNumber(1, 25);
-const generateCommentId = createUnicNumber(1, 999);
-
-const generateComment = () => ({
-  id: generateCommentId(),
-  avatar: `img/avatar-${getRandomNumber(1, 6)}.svg`,
+const createComment = (index) => ({
+  id: index,
+  avatar: `img/avatar-${getRandomNumber(Avatars.MIN, Avatars.MAX)}.svg`,
   message: getRandomArrayEl(MESSAGES),
   name: getRandomArrayEl(NAMES)
 });
 
-const generatePhotoObj = () => ({
-  id: generatePhotoId(),
-  url: `photos/${generateUrlNumber()}.jpg`,
+const generateComments = (amount) => {
+  const comments = [];
+  for (let i = 1; i <= amount; i++) {
+    comments.push(createComment(i));
+  }
+  return comments;
+};
+
+const createPhoto = (index) => ({
+  id: index,
+  url: `photos/${index}.jpg`,
   description: getRandomArrayEl(DESCRIPTIONS),
-  likes: getRandomNumber(15, 200),
-  comments: Array.from({length: getRandomNumber(0, 30)}, generateComment)
+  likes: getRandomNumber(Likes.MIN, Likes.MAX),
+  comments: generateComments(getRandomNumber(Comments.MIN, Comments.MAX))
 });
 
-const photos = Array.from({length: 25}, generatePhotoObj);
+const generatePhotos = () => {
+  for (let i = 1; i <= PHOTOS_COUNT; i++) {
+    photos.push(createPhoto(i));
+  }
+};
 
-export { photos };
+generatePhotos();
