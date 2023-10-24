@@ -1,3 +1,5 @@
+import {isEscapeKey} from './util.js';
+
 const COMMENTS_COUNT_AT_ONCE = 5;
 
 const fullPhoto = document.querySelector('.big-picture');
@@ -17,7 +19,7 @@ const renderComment = ({avatar, name, message}) => `
 `;
 
 const renderCurrentComments = (maxIndex, comments) => {
-  let currentIndex = commentsList.children.length > 0 ? commentsList.children.length : 0;
+  let currentIndex = commentsList.children.length;
   if (maxIndex >= comments.length) {
     maxIndex = comments.length;
     loadBtn.classList.add('hidden');
@@ -29,12 +31,12 @@ const renderCurrentComments = (maxIndex, comments) => {
   }
 };
 
-let loadCommentsOnBtn;
+let onloadCommentsBtnClick;
 
 const renderComments = (comments) => {
   let maxIndex = COMMENTS_COUNT_AT_ONCE;
 
-  loadCommentsOnBtn = () => {
+  onloadCommentsBtnClick = () => {
     renderCurrentComments(maxIndex, comments);
     fullPhoto.querySelector('.social__comment-shown-count').textContent = maxIndex > comments.length ? comments.length : maxIndex;
     maxIndex += COMMENTS_COUNT_AT_ONCE;
@@ -42,10 +44,8 @@ const renderComments = (comments) => {
 
   commentsList.innerHTML = '';
   loadBtn.classList.remove('hidden');
-
-  loadCommentsOnBtn();
-
-  loadBtn.addEventListener('click', loadCommentsOnBtn);
+  onloadCommentsBtnClick();
+  loadBtn.addEventListener('click', onloadCommentsBtnClick);
 };
 
 const renderFullPhoto = ({url, likes, comments, description}) => {
@@ -58,15 +58,16 @@ const renderFullPhoto = ({url, likes, comments, description}) => {
 };
 
 const closeFullPhoto = () => {
-  loadBtn.removeEventListener('click', loadCommentsOnBtn);
   fullPhoto.classList.add('hidden');
   document.body.classList.remove('modal-open');
+
+  loadBtn.removeEventListener('click', onloadCommentsBtnClick);
   closeBtn.removeEventListener('click', closeFullPhoto);
   document.removeEventListener('keydown', closeFullPhotoByEscape);
 };
 
 function closeFullPhotoByEscape (evt) {
-  if (evt.key === 'Escape') {
+  if (isEscapeKey(evt)) {
     evt.preventDefault();
     closeFullPhoto();
   }
@@ -74,9 +75,9 @@ function closeFullPhotoByEscape (evt) {
 
 const openFullPhoto = (photo) => {
   renderFullPhoto(photo);
-
   document.body.classList.add('modal-open');
   fullPhoto.classList.remove('hidden');
+
   closeBtn.addEventListener('click', closeFullPhoto);
   document.addEventListener('keydown', closeFullPhotoByEscape);
 };
