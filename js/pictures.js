@@ -1,7 +1,4 @@
-import {generatePhotos} from './data.js';
 import {openFullPhoto} from './full-photo.js';
-
-const pictures = generatePhotos();
 
 const container = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
@@ -20,7 +17,7 @@ const renderPicture = (picture) => {
   return pictureElement;
 };
 
-const renderPictures = () => {
+const renderPictures = (pictures) => {
   pictures.forEach((picture) => {
     const pictureElement = renderPicture(picture);
     fragment.append(pictureElement);

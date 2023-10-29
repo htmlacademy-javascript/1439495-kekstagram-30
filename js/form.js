@@ -1,4 +1,3 @@
-import '../vendor/pristine/pristine.min.js';
 import {isEscapeKey} from './util.js';
 
 const MAX_COMMENT_LENGTH = 140;
@@ -18,12 +17,6 @@ commentInput.addEventListener('keydown', resetCloseByEscape);
 
 const regexpForHashtag = /^#[\wа-яё]{1,19}$/i;
 
-const resetForm = () => {
-  inputPhoto.value = '';
-  hashtagInput.value = '';
-  commentInput.value = '';
-};
-
 const closeForm = () => {
   formToEditPhoto.classList.add('hidden');
   document.body.classList.remove('modal-open');
@@ -31,7 +24,7 @@ const closeForm = () => {
   closeFormBtn.removeEventListener('click', closeForm);
   document.removeEventListener('keydown', closeFormByEscape);
 
-  resetForm();
+  form.reset();
 };
 
 function closeFormByEscape (evt) {
@@ -57,7 +50,7 @@ const pristine = new Pristine(form, {
 });
 
 const validateHashtag = (value) => {
-  const hashtagArr = value.split(' ');
+  const hashtagArr = value.toLowerCase().trim().split(/\s+/);
 
   return !(hashtagArr.find((item) => !regexpForHashtag.test(item))) &&
         !(hashtagArr.length > MAX_HASHTAGS) &&
@@ -65,7 +58,7 @@ const validateHashtag = (value) => {
 };
 
 const getHashtagErrorMessage = () => {
-  const hashtagArr = hashtagInput.value.split(' ');
+  const hashtagArr = hashtagInput.value.toLowerCase().trim().split(/\s+/);
 
   if (hashtagArr.find((item) => !regexpForHashtag.test(item))) {
     return 'Введён невалидный хэш-тег';
