@@ -1,7 +1,4 @@
-import {generatePhotos} from './data.js';
 import {openFullPhoto} from './full-photo.js';
-
-const pictures = generatePhotos();
 
 const container = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
@@ -13,13 +10,14 @@ const renderPicture = (picture) => {
   pictureElement.querySelector('.picture__img').alt = picture.description;
   pictureElement.querySelector('.picture__likes').textContent = picture.likes;
   pictureElement.querySelector('.picture__comments').textContent = picture.comments.length;
-  pictureElement.addEventListener('click', () => {
+  pictureElement.addEventListener('click', (evt) => {
+    evt.preventDefault();
     openFullPhoto(picture);
   });
   return pictureElement;
 };
 
-const renderPictures = () => {
+const renderPictures = (pictures) => {
   pictures.forEach((picture) => {
     const pictureElement = renderPicture(picture);
     fragment.append(pictureElement);
