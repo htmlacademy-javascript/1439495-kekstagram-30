@@ -1,7 +1,9 @@
 import {isEscapeKey} from './util.js';
+import {changeSliderOptions as onEffectsClickHandler} from './slider.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAGS = 5;
+const ZOOM_CHANGE = 25;
 
 const form = document.querySelector('.img-upload__form');
 const inputPhoto = form.querySelector('.img-upload__input');
@@ -10,12 +12,26 @@ const closeFormBtn = form.querySelector('.img-upload__cancel');
 
 const hashtagInput = form.querySelector('.text__hashtags');
 const commentInput = form.querySelector('.text__description');
+const scaleInput = form.querySelector('.scale__control--value');
+
+const effectsList = form.querySelector('.effects__list');
+const image = form.querySelector('.img-upload__preview img');
 
 const resetCloseByEscape = (evt) => evt.stopPropagation();
-hashtagInput.addEventListener('keydown', resetCloseByEscape);
-commentInput.addEventListener('keydown', resetCloseByEscape);
 
 const regexpForHashtag = /^#[\wа-яё]{1,19}$/i;
+
+const changeScale = (evt) => {
+  let newValue = parseInt(scaleInput.value, 10);
+  if(evt.target.classList.contains('scale__control--smaller')) {
+    newValue = newValue - ZOOM_CHANGE < ZOOM_CHANGE ? ZOOM_CHANGE : newValue - ZOOM_CHANGE;
+  }
+  if(evt.target.classList.contains('scale__control--bigger')) {
+    newValue = newValue + ZOOM_CHANGE > 100 ? 100 : newValue + ZOOM_CHANGE;
+  }
+  scaleInput.value = `${newValue}%`;
+  image.style.transform = `scale(${newValue === 100 ? '1' : `0.${newValue}`})`;
+};
 
 const closeForm = () => {
   formToEditPhoto.classList.add('hidden');
@@ -23,7 +39,13 @@ const closeForm = () => {
 
   closeFormBtn.removeEventListener('click', closeForm);
   document.removeEventListener('keydown', closeFormByEscape);
+  hashtagInput.removeEventListener('keydown', resetCloseByEscape);
+  commentInput.removeEventListener('keydown', resetCloseByEscape);
+  effectsList.removeEventListener('click', onEffectsClickHandler);
+  form.querySelector('.img-upload__scale').removeEventListener('click', changeScale);
 
+  image.style.removeProperty('transform');
+  image.style.removeProperty('filter');
   form.reset();
 };
 
@@ -36,9 +58,14 @@ function closeFormByEscape (evt) {
 const openForm = () => {
   formToEditPhoto.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  document.querySelector('.img-upload__effect-level').classList.add('hidden');
 
   closeFormBtn.addEventListener('click', closeForm);
   document.addEventListener('keydown', closeFormByEscape);
+  hashtagInput.addEventListener('keydown', resetCloseByEscape);
+  commentInput.addEventListener('keydown', resetCloseByEscape);
+  effectsList.addEventListener('click', onEffectsClickHandler);
+  form.querySelector('.img-upload__scale').addEventListener('click', changeScale);
 };
 
 inputPhoto.addEventListener('change', openForm);
