@@ -3,7 +3,12 @@ import {changeSliderOptions as onEffectsClickHandler} from './slider.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAGS = 5;
-const ZOOM_CHANGE = 25;
+
+const Zoom = {
+  MIN: 25,
+  MAX: 100,
+  STEP: 25
+};
 
 const form = document.querySelector('.img-upload__form');
 const inputPhoto = form.querySelector('.img-upload__input');
@@ -21,17 +26,33 @@ const resetCloseByEscape = (evt) => evt.stopPropagation();
 
 const regexpForHashtag = /^#[\wа-яё]{1,19}$/i;
 
-const changeScale = (evt) => {
+const changeScale = (factor = 1) => {
   let newValue = parseInt(scaleInput.value, 10);
-  if(evt.target.classList.contains('scale__control--smaller')) {
-    newValue = newValue - ZOOM_CHANGE < ZOOM_CHANGE ? ZOOM_CHANGE : newValue - ZOOM_CHANGE;
+  newValue = newValue + Zoom.STEP * factor;
+  if (newValue > Zoom.MAX) {
+    newValue = Zoom.MAX;
   }
-  if(evt.target.classList.contains('scale__control--bigger')) {
-    newValue = newValue + ZOOM_CHANGE > 100 ? 100 : newValue + ZOOM_CHANGE;
+  if (newValue < Zoom.MIN) {
+    newValue = Zoom.MIN;
   }
   scaleInput.value = `${newValue}%`;
-  image.style.transform = `scale(${newValue === 100 ? '1' : `0.${newValue}`})`;
+  image.style.transform = `scale(${newValue / 100})`;
 };
+
+const onScaleBtnClick = (evt) => {
+  if(evt.target.classList.contains('scale__control--smaller')) {
+    changeScale(-1);
+  }
+  if(evt.target.classList.contains('scale__control--bigger')) {
+    changeScale();
+  }
+};
+
+const pristine = new Pristine(form, {
+  classTo: 'img-upload__field-wrapper',
+  errorTextParent: 'img-upload__field-wrapper',
+  errorTextClass: 'img-upload__field-wrapper--error',
+});
 
 const closeForm = () => {
   formToEditPhoto.classList.add('hidden');
@@ -42,11 +63,12 @@ const closeForm = () => {
   hashtagInput.removeEventListener('keydown', resetCloseByEscape);
   commentInput.removeEventListener('keydown', resetCloseByEscape);
   effectsList.removeEventListener('click', onEffectsClickHandler);
-  form.querySelector('.img-upload__scale').removeEventListener('click', changeScale);
+  form.querySelector('.img-upload__scale').removeEventListener('click', onScaleBtnClick);
 
   image.style.removeProperty('transform');
   image.style.removeProperty('filter');
   form.reset();
+  pristine.reset();
 };
 
 function closeFormByEscape (evt) {
@@ -65,16 +87,10 @@ const openForm = () => {
   hashtagInput.addEventListener('keydown', resetCloseByEscape);
   commentInput.addEventListener('keydown', resetCloseByEscape);
   effectsList.addEventListener('click', onEffectsClickHandler);
-  form.querySelector('.img-upload__scale').addEventListener('click', changeScale);
+  form.querySelector('.img-upload__scale').addEventListener('click', onScaleBtnClick);
 };
 
 inputPhoto.addEventListener('change', openForm);
-
-const pristine = new Pristine(form, {
-  classTo: 'img-upload__field-wrapper',
-  errorTextParent: 'img-upload__field-wrapper',
-  errorTextClass: 'img-upload__field-wrapper--error',
-});
 
 const validateHashtag = (value) => {
   const hashtagArr = value.toLowerCase().trim().split(/\s+/);
