@@ -1,5 +1,6 @@
 import {isEscapeKey} from './util.js';
 import {changeSliderOptions as onEffectsClickHandler} from './slider.js';
+import { sendData } from './server.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAGS = 5;
@@ -121,7 +122,11 @@ const validateComment = (value) => value.length < MAX_COMMENT_LENGTH;
 pristine.addValidator(commentInput, validateComment, `Длина комментария больше ${MAX_COMMENT_LENGTH} символов`);
 
 form.addEventListener('submit', (evt) => {
-  if (!pristine.validate()) {
-    evt.preventDefault();
+  evt.preventDefault();
+  if (pristine.validate()) {
+    const data = new FormData(form);
+    form.querySelector('.img-upload__submit').disabled = true;
+    sendData(data, closeForm, closeFormByEscape);
+    form.querySelector('.img-upload__submit').disabled = false;
   }
 });

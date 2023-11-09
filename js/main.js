@@ -1,7 +1,5 @@
-import {generatePhotos} from './data.js';
 import {renderPictures} from './pictures.js';
 import './form.js';
+import { getData } from './server.js';
 
-const photos = generatePhotos();
-
-renderPictures(photos);
+getData().then((photos) => renderPictures(photos));
