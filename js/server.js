@@ -1,75 +1,23 @@
-import {isEscapeKey} from './util.js';
-
-const URL = 'https://30.javascript.pages.academy/kekstagram';
-const TIME_TO_DELETE_MESSAGE = 5000;
-
-const errorElement = document.querySelector('#data-error').content.querySelector('.data-error');
-const successMessage = document.querySelector('#success').content.querySelector('.success');
-const errorMessage = document.querySelector('#error').content.querySelector('.error');
-
-const isResponseOk = (response) => {
-  if (!response.ok) {
-    throw new Error();
-  }
+const Urls = {
+  GET: 'https://30.javascript.pages.academy/kekstagram/data',
+  POST: 'https://30.javascript.pages.academy/kekstagram',
 };
 
-const removeMessage = () => {
-  document.body.lastChild.remove();
-  document.removeEventListener('keydown', onEscapeBtnClick);
-};
-
-function onEscapeBtnClick (evt) {
-  if (isEscapeKey(evt)) {
-    removeMessage();
-  }
-}
-
-const renderMessage = (element) => {
-  const message = element.cloneNode(true);
-
-  message.querySelector('button').addEventListener('click', () => {
-    removeMessage();
-  });
-
-  message.addEventListener('click', (evt) => {
-    if (evt.target.classList.contains('success') || evt.target.classList.contains('error')) {
-      removeMessage();
+const sendRequest = (onSuccess, onFail, method, body) => {
+  fetch(
+    Urls[method],
+    {
+      method,
+      body,
     }
-  });
-
-  document.addEventListener('keydown', onEscapeBtnClick);
-
-  document.body.append(message);
+  )
+    .then((response) => response.json())
+    .then((data) => onSuccess(data))
+    .catch(() => onFail());
 };
 
-const getData = () => fetch(`${URL}/data`)
-  .then((response) => {
-    isResponseOk(response);
-    return response.json();
-  })
-  .catch(() => {
-    const message = errorElement.cloneNode(true);
-    document.body.append(message);
-    setTimeout(() => {
-      message.remove();
-    }, TIME_TO_DELETE_MESSAGE);
-  });
+const getData = (onSuccess, onFail, method = 'GET') => sendRequest(onSuccess, onFail, method);
 
-const sendData = (data, onSuccess, escapeFormHandler) => fetch(
-  URL,
-  {
-    method: 'POST',
-    body: data
-  })
-  .then((response) => {
-    isResponseOk(response);
-    renderMessage(successMessage);
-    onSuccess();
-  })
-  .catch(() => {
-    renderMessage(errorMessage);
-    document.removeEventListener('keydown', escapeFormHandler);
-  });
-
+const sendData = (onSuccess, onFail, method, body) => sendRequest(onSuccess, onFail, method, body);
 
 export { getData, sendData };

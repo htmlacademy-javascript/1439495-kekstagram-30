@@ -121,12 +121,55 @@ const validateComment = (value) => value.length < MAX_COMMENT_LENGTH;
 
 pristine.addValidator(commentInput, validateComment, `Длина комментария больше ${MAX_COMMENT_LENGTH} символов`);
 
+const successMessage = document.querySelector('#success').content.querySelector('.success');
+const errorMessage = document.querySelector('#error').content.querySelector('.error');
+
+const removeMessage = () => {
+  document.body.lastChild.remove();
+  document.removeEventListener('keydown', onEscapeBtnClick);
+};
+
+function onEscapeBtnClick (evt) {
+  if (isEscapeKey(evt)) {
+    removeMessage();
+  }
+}
+
+const renderMessage = (element) => {
+  const message = element.cloneNode(true);
+
+  message.querySelector('button').addEventListener('click', () => {
+    removeMessage();
+  });
+
+  message.addEventListener('click', (evt) => {
+    if (evt.target.classList.contains('success') || evt.target.classList.contains('error')) {
+      removeMessage();
+    }
+  });
+
+  document.addEventListener('keydown', onEscapeBtnClick);
+
+  document.body.append(message);
+};
+
+const sendForm = () => {
+  renderMessage(successMessage);
+  closeForm();
+  form.querySelector('.img-upload__submit').disabled = false;
+};
+
+const showErrorMessage = () => {
+  renderMessage(errorMessage);
+  form.querySelector('.img-upload__submit').disabled = false;
+  document.removeEventListener('keydown', closeFormByEscape);
+};
+
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
   if (pristine.validate()) {
     const data = new FormData(form);
     form.querySelector('.img-upload__submit').disabled = true;
-    sendData(data, closeForm, closeFormByEscape);
-    form.querySelector('.img-upload__submit').disabled = false;
+    sendData(sendForm, showErrorMessage, 'POST', data);
   }
 });
