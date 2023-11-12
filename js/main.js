@@ -1,7 +1,14 @@
-import {generatePhotos} from './data.js';
 import {renderPictures} from './pictures.js';
 import './form.js';
+import { getData } from './server.js';
+import {showDataErrorMessage} from './util.js';
 
-const photos = generatePhotos();
+let photos = [];
 
-renderPictures(photos);
+const loadPhotos = (data) => {
+  photos = data.slice();
+  renderPictures(photos);
+};
+
+getData(loadPhotos, showDataErrorMessage);
+
