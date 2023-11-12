@@ -1,15 +1,11 @@
 import {isEscapeKey} from './util.js';
 import {changeSliderOptions as onEffectsClickHandler} from './slider.js';
 import { sendData } from './server.js';
+import { onScaleBtnClick } from './scale.js';
+import { showErrorMessage, showSuccessMessage } from './messages.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAGS = 5;
-
-const Zoom = {
-  MIN: 25,
-  MAX: 100,
-  STEP: 25
-};
 
 const form = document.querySelector('.img-upload__form');
 const inputPhoto = form.querySelector('.img-upload__input');
@@ -18,7 +14,6 @@ const closeFormBtn = form.querySelector('.img-upload__cancel');
 
 const hashtagInput = form.querySelector('.text__hashtags');
 const commentInput = form.querySelector('.text__description');
-const scaleInput = form.querySelector('.scale__control--value');
 
 const effectsList = form.querySelector('.effects__list');
 const image = form.querySelector('.img-upload__preview img');
@@ -26,28 +21,6 @@ const image = form.querySelector('.img-upload__preview img');
 const resetCloseByEscape = (evt) => evt.stopPropagation();
 
 const regexpForHashtag = /^#[\wа-яё]{1,19}$/i;
-
-const changeScale = (factor = 1) => {
-  let newValue = parseInt(scaleInput.value, 10);
-  newValue = newValue + Zoom.STEP * factor;
-  if (newValue > Zoom.MAX) {
-    newValue = Zoom.MAX;
-  }
-  if (newValue < Zoom.MIN) {
-    newValue = Zoom.MIN;
-  }
-  scaleInput.value = `${newValue}%`;
-  image.style.transform = `scale(${newValue / 100})`;
-};
-
-const onScaleBtnClick = (evt) => {
-  if(evt.target.classList.contains('scale__control--smaller')) {
-    changeScale(-1);
-  }
-  if(evt.target.classList.contains('scale__control--bigger')) {
-    changeScale();
-  }
-};
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -59,12 +32,7 @@ const closeForm = () => {
   formToEditPhoto.classList.add('hidden');
   document.body.classList.remove('modal-open');
 
-  closeFormBtn.removeEventListener('click', closeForm);
   document.removeEventListener('keydown', closeFormByEscape);
-  hashtagInput.removeEventListener('keydown', resetCloseByEscape);
-  commentInput.removeEventListener('keydown', resetCloseByEscape);
-  effectsList.removeEventListener('click', onEffectsClickHandler);
-  form.querySelector('.img-upload__scale').removeEventListener('click', onScaleBtnClick);
 
   image.style.removeProperty('transform');
   image.style.removeProperty('filter');
@@ -72,8 +40,10 @@ const closeForm = () => {
   pristine.reset();
 };
 
+const isErrorMessageShow = () => Boolean(document.body.querySelector('.error'));
+
 function closeFormByEscape (evt) {
-  if (isEscapeKey(evt)) {
+  if (isEscapeKey(evt) && !isErrorMessageShow()) {
     closeForm();
   }
 }
@@ -83,14 +53,14 @@ const openForm = () => {
   document.body.classList.add('modal-open');
   document.querySelector('.img-upload__effect-level').classList.add('hidden');
 
-  closeFormBtn.addEventListener('click', closeForm);
   document.addEventListener('keydown', closeFormByEscape);
-  hashtagInput.addEventListener('keydown', resetCloseByEscape);
-  commentInput.addEventListener('keydown', resetCloseByEscape);
-  effectsList.addEventListener('click', onEffectsClickHandler);
-  form.querySelector('.img-upload__scale').addEventListener('click', onScaleBtnClick);
 };
 
+closeFormBtn.addEventListener('click', closeForm);
+hashtagInput.addEventListener('keydown', resetCloseByEscape);
+commentInput.addEventListener('keydown', resetCloseByEscape);
+effectsList.addEventListener('click', onEffectsClickHandler);
+form.querySelector('.img-upload__scale').addEventListener('click', onScaleBtnClick);
 inputPhoto.addEventListener('change', openForm);
 
 const validateHashtag = (value) => {
@@ -121,48 +91,10 @@ const validateComment = (value) => value.length < MAX_COMMENT_LENGTH;
 
 pristine.addValidator(commentInput, validateComment, `Длина комментария больше ${MAX_COMMENT_LENGTH} символов`);
 
-const successMessage = document.querySelector('#success').content.querySelector('.success');
-const errorMessage = document.querySelector('#error').content.querySelector('.error');
-
-const removeMessage = () => {
-  document.body.lastChild.remove();
-  document.removeEventListener('keydown', onEscapeBtnClick);
-};
-
-function onEscapeBtnClick (evt) {
-  if (isEscapeKey(evt)) {
-    removeMessage();
-  }
-}
-
-const renderMessage = (element) => {
-  const message = element.cloneNode(true);
-
-  message.querySelector('button').addEventListener('click', () => {
-    removeMessage();
-  });
-
-  message.addEventListener('click', (evt) => {
-    if (evt.target.classList.contains('success') || evt.target.classList.contains('error')) {
-      removeMessage();
-    }
-  });
-
-  document.addEventListener('keydown', onEscapeBtnClick);
-
-  document.body.append(message);
-};
-
 const sendForm = () => {
-  renderMessage(successMessage);
+  showSuccessMessage();
   closeForm();
   form.querySelector('.img-upload__submit').disabled = false;
-};
-
-const showErrorMessage = () => {
-  renderMessage(errorMessage);
-  form.querySelector('.img-upload__submit').disabled = false;
-  document.removeEventListener('keydown', closeFormByEscape);
 };
 
 form.addEventListener('submit', (evt) => {
