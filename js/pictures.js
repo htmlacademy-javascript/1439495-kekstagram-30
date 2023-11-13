@@ -2,7 +2,6 @@ import {openFullPhoto} from './full-photo.js';
 
 const container = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
-const fragment = document.createDocumentFragment();
 
 const renderPicture = (picture) => {
   const pictureElement = pictureTemplate.cloneNode(true);
@@ -17,7 +16,16 @@ const renderPicture = (picture) => {
   return pictureElement;
 };
 
+const clearPicturesContainer = () => {
+  container.querySelectorAll('a.picture').forEach((item) => {
+    item.remove();
+  });
+};
+
 const renderPictures = (pictures) => {
+  clearPicturesContainer();
+
+  const fragment = document.createDocumentFragment();
   pictures.forEach((picture) => {
     const pictureElement = renderPicture(picture);
     fragment.append(pictureElement);
