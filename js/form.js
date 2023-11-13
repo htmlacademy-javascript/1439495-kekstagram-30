@@ -6,6 +6,7 @@ import { showErrorMessage, showSuccessMessage } from './messages.js';
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAGS = 5;
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const form = document.querySelector('.img-upload__form');
 const inputPhoto = form.querySelector('.img-upload__input');
@@ -56,12 +57,22 @@ const openForm = () => {
   document.addEventListener('keydown', closeFormByEscape);
 };
 
+const onChooseFileBtnClick = () => {
+  openForm();
+
+  const file = inputPhoto.files[0];
+  const isCorrectFileType = FILE_TYPES.some((item) => file.name.toLowerCase().endsWith(item));
+  if (isCorrectFileType) {
+    image.src = URL.createObjectURL(file);
+  }
+};
+
 closeFormBtn.addEventListener('click', closeForm);
 hashtagInput.addEventListener('keydown', resetCloseByEscape);
 commentInput.addEventListener('keydown', resetCloseByEscape);
 effectsList.addEventListener('click', onEffectsClickHandler);
 form.querySelector('.img-upload__scale').addEventListener('click', onScaleBtnClick);
-inputPhoto.addEventListener('change', openForm);
+inputPhoto.addEventListener('change', onChooseFileBtnClick);
 
 const validateHashtag = (value) => {
   const hashtagArr = value.toLowerCase().trim().split(/\s+/);
