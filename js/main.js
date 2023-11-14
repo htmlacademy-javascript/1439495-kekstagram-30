@@ -1,8 +1,8 @@
-import {renderPictures} from './pictures.js';
-import './form.js';
+import { renderPictures } from './pictures.js';
 import { getData } from './server.js';
-import {showDataErrorMessage} from './util.js';
+import { showDataErrorMessage } from './util.js';
 import { initFilter } from './filter.js';
+import './form.js';
 
 const loadPhotos = (data) => {
   renderPictures(data);

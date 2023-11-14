@@ -1,10 +1,10 @@
-import {openFullPhoto} from './full-photo.js';
+import { openFullPhoto } from './full-photo.js';
 
-const container = document.querySelector('.pictures');
-const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
+const containerElement = document.querySelector('.pictures');
+const pictureTemplateElement = document.querySelector('#picture').content.querySelector('.picture');
 
 const renderPicture = (picture) => {
-  const pictureElement = pictureTemplate.cloneNode(true);
+  const pictureElement = pictureTemplateElement.cloneNode(true);
   pictureElement.querySelector('.picture__img').src = picture.url;
   pictureElement.querySelector('.picture__img').alt = picture.description;
   pictureElement.querySelector('.picture__likes').textContent = picture.likes;
@@ -17,8 +17,8 @@ const renderPicture = (picture) => {
 };
 
 const clearPicturesContainer = () => {
-  if (container.querySelectorAll('a.picture')) {
-    container.querySelectorAll('a.picture').forEach((item) => item.remove());
+  if (containerElement.querySelectorAll('a.picture')) {
+    containerElement.querySelectorAll('a.picture').forEach((item) => item.remove());
   }
 };
 
@@ -30,7 +30,7 @@ const renderPictures = (pictures) => {
     const pictureElement = renderPicture(picture);
     fragment.append(pictureElement);
   });
-  container.append(fragment);
+  containerElement.append(fragment);
 };
 
-export {renderPictures};
+export { renderPictures };
