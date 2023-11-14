@@ -22,16 +22,21 @@ const getDiscussedPhotos = (data) => {
   return sortPhotos;
 };
 
+const changeActiveFilterBtnClass = (evt) => {
+  filter.querySelector('.img-filters__button--active').classList.remove('img-filters__button--active');
+  evt.target.classList.add('img-filters__button--active');
+};
+
 const setFilter = (cb) => {
   filter.addEventListener('click', (evt) => {
     let newPhotos = photos.slice();
-    filter.querySelector('.img-filters__button--active').classList.remove('img-filters__button--active');
-    evt.target.classList.add('img-filters__button--active');
-    if (evt.target.id.includes('random')) {
-      newPhotos = getRandomPhotos(photos);
-    }
-    if (evt.target.id.includes('discussed')) {
-      newPhotos = getDiscussedPhotos(photos);
+    changeActiveFilterBtnClass(evt);
+    switch (evt.target.id) {
+      case 'filter-random':
+        newPhotos = getRandomPhotos(photos);
+        break;
+      case 'filter-discussed':
+        newPhotos = getDiscussedPhotos(photos);
     }
     cb(newPhotos);
   });
