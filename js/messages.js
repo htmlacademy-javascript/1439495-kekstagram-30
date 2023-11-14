@@ -1,15 +1,16 @@
 import { isEscapeKey } from './util.js';
 
-const successMessage = document.querySelector('#success').content.querySelector('.success');
-const errorMessage = document.querySelector('#error').content.querySelector('.error');
-
+const successMessageElement = document.querySelector('#success').content.querySelector('.success');
+const errorMessageElement = document.querySelector('#error').content.querySelector('.error');
 
 const removeMessage = () => {
   document.body.lastChild.remove();
-  document.removeEventListener('keydown', onEscapeBtnClick);
+  document.removeEventListener('keydown', onEscapeBtnKeydown);
 };
-function onEscapeBtnClick (evt) {
+
+function onEscapeBtnKeydown (evt) {
   if (isEscapeKey(evt)) {
+    evt.preventDefault();
     removeMessage();
   }
 }
@@ -27,18 +28,18 @@ const renderMessage = (element) => {
     }
   });
 
-  document.addEventListener('keydown', onEscapeBtnClick);
+  document.addEventListener('keydown', onEscapeBtnKeydown);
 
   document.body.append(message);
 };
 
 const showErrorMessage = () => {
-  renderMessage(errorMessage);
+  renderMessage(errorMessageElement);
   document.querySelector('.img-upload__submit').disabled = false;
 };
 
 const showSuccessMessage = () => {
-  renderMessage(successMessage);
+  renderMessage(successMessageElement);
 };
 
-export {showErrorMessage, showSuccessMessage};
+export { showErrorMessage, showSuccessMessage };

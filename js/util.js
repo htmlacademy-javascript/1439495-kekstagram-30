@@ -22,4 +22,4 @@ const debounce = (callback, timeoutDelay) => {
   };
 };
 
-export {isEscapeKey, showDataErrorMessage, getRandomArrayEl, debounce};
+export { isEscapeKey, showDataErrorMessage, getRandomArrayEl, debounce };
